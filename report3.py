@@ -23,7 +23,7 @@ def linear_regression(X, Y, num_of_data = 300, epochs = 1000, learning_rate = 0.
         y_current = []      # i번째 x일 때 예측값 y_current = ax^3 + bx^2 + cx + d
         for i in range(N):
             # i번째 x일 때 예측값 y_current = ax^3 + bx^2 + cx + d
-            y_current.append((a_current * X[i] ** 3) + (b_current * X[i] ** 2) + (c_current * X[i]) + (d_current))
+            y_current.append((a_current * X[i] ** 3) + (b_current * X[i] ** 2) + (c_current * X[i]) + d_current)
 
             a_gradient += (X[i] ** 3) * (Y[i] - y_current[i])   # a 편미분 1단계
             b_gradient += (X[i] ** 2) * (Y[i] - y_current[i])   # b 편미분 1단계
@@ -42,63 +42,72 @@ def linear_regression(X, Y, num_of_data = 300, epochs = 1000, learning_rate = 0.
         c_current = c_current - (learning_rate * c_gradient)    # c 값, 학습률에 따라 경사하강법
         d_current = d_current - (learning_rate * d_gradient)    # d 값, 학습률에 따라 경사하강법
 
-        if (cnt+1) % 100 == 0:
-            print(f'============================== Epoch : {cnt+1} =============================================')
+
+        # 에포크 10 마다 근사함수 값 출력
+        if (cnt+1) % 10 == 0:
+            print(f'================= Epoch : {cnt+1} =================')
             print(f'y = {a_current:.4f}x^3 + {b_current:.4f}x^2 + {c_current:.4f}x + {d_current:.4f}')
             print(f'cost = {cost}')
 
     return a_current, b_current, c_current, d_current, cost
 
 
-# 랜덤한 데이터 생성
+# 문제의 조건에 맞는 랜덤한 데이터 생성
 def initializing(num_of_data = 300):
-    x = []
-    y = []
+    X = []
+    Y = []
 
-    # x 는 [0, 3] 구간의 랜덤한 실수
-    # y = x^3 - 4.5x^2 + 6x + 2 의 함수에 랜덤한 실수 x 값 대입 후
-    # [-0.5, 0.5] 사이의 값을 랜덤하게 생성하여 더함
     for i in range(num_of_data):
-        temp_x = random.uniform(0, 3)
-        temp_y = (temp_x * temp_x * temp_x) + (4.5 * temp_x * temp_x) \
-                 + (6 * temp_x) + 2 \
-                 + random.uniform(-0.5, 0.5)
-        x.append(temp_x)
-        y.append(temp_y)
+        # x 는 [0, 3] 구간의 랜덤한 실수
+        x = random.uniform(0, 3)
+        # y = x^3 - 4.5x^2 + 6x + 2 의 함수에 랜덤한 실수 x 값 대입 후
+        # [-0.5, 0.5] 사이의 값을 랜덤하게 생성하여 더함
+        y = x**3 - (4.5 * x**2) + (6 * x) + 2 + random.uniform(-0.5, 0.5)
+        X.append(x)
+        Y.append(y)
 
-    return x, y
+    # x 값 기준으로 오름차순 정렬
+    temp = [[a, b] for a, b in zip(X, Y)]
+    temp.sort(key=lambda X:X[0])
+
+    X = [a[0] for a in temp]
+    Y = [b[0] for b in temp]
+
+    return X, Y
 
 
 # main 부분
+
 num_of_data = 300
-x, y = initializing(num_of_data)
+X, Y = initializing(num_of_data)
 
 # 생성한 데이터 출력 (실제값)
-for i in range(len(x)):
-    print(f'{i+1}: {x[i]}, {y[i]}')
+for i in range(len(X)):
+    print(f'{i+1}: {X[i]}, {Y[i]}')
 print("============================== End of Initializing ==============================")
 print()
 print()
 
 # 경사하강법 시행
-a, b, c, d, cost = linear_regression(x, y, num_of_data=num_of_data, epochs=10000, learning_rate=0.0001)
+a, b, c, d, cost = linear_regression(X, Y, num_of_data=num_of_data, epochs=10000, learning_rate=0.0001)
 
 # 생성한 데이터 그래프 출력
 plt.subplot(1, 3, 1)
 plt.title("Data")
-plt.plot(x, y, 'r.')
+plt.plot(X, Y, 'r.')
 
 # 근사함수 그래프 출력
 plt.subplot(1, 3, 2)
 plt.title("Graph of Function Approximation")
-x_range = np.linspace(0, 3, 300)
-y_range = [a*n*n*n + b*n*n + c*n + d for n in x_range]
-plt.plot(x_range, y_range, 'g')
+# x_range = np.linspace(0, 3, 300)
+x_range = np.array(X)
+y_range = np.array([a*x**3 + b*x**2 + c*x + d for x in x_range])
+plt.plot(x_range, y_range, 'b')
 
 # 생성한 데이터 그래프와 근사함수 그래프 동시 출력
 plt.subplot(1, 3, 3)
 plt.title("Graph of Data & Function Approximation")
-plt.plot(x, y, 'r.', label='Data')
+plt.plot(X, Y, 'r.', label='Data')
 plt.plot(x_range, y_range, 'b', label='Function Approximation')
 plt.legend()
 
