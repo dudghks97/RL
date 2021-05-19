@@ -58,7 +58,7 @@ def initializing(num_of_data = 300):
     # [0, 3] 사이의 랜덤한 실수 x, x 에 따른 y
     for i in range(num_of_data):
         temp_x = random.uniform(0, 3)
-        temp_y = (temp_x * temp_x * temp_x) + (4.5 * temp_x * temp_x) \
+        temp_y = (temp_x * temp_x * temp_x) - (4.5 * temp_x * temp_x) \
                  + (6 * temp_x) + 2 \
                  + random.uniform(-0.5, 0.5)
         x.append(temp_x)

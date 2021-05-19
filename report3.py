@@ -23,7 +23,7 @@ def linear_regression(X, Y, num_of_data = 300, epochs = 1000, learning_rate = 0.
         y_current = []      # i번째 x일 때 예측값 y_current = ax^3 + bx^2 + cx + d
         for i in range(N):
             # i번째 x일 때 예측값 y_current = ax^3 + bx^2 + cx + d
-            y_current.append((a_current * X[i] ** 3) + (b_current * X[i] ** 2) + (c_current * X[i]) + d_current)
+            y_current.append((a_current * (X[i] ** 3)) + (b_current * (X[i] ** 2)) + (c_current * X[i]) + d_current)
 
             a_gradient += (X[i] ** 3) * (Y[i] - y_current[i])   # a 편미분 1단계
             b_gradient += (X[i] ** 2) * (Y[i] - y_current[i])   # b 편미분 1단계
@@ -101,7 +101,7 @@ plt.subplot(1, 3, 2)
 plt.title("Graph of Function Approximation")
 # x_range = np.linspace(0, 3, 300)
 x_range = np.array(X)
-y_range = np.array([a*x**3 + b*x**2 + c*x + d for x in x_range])
+y_range = np.array([a*(x**3) + b*(x**2) + c*x + d for x in x_range])
 plt.plot(x_range, y_range, 'b')
 
 # 생성한 데이터 그래프와 근사함수 그래프 동시 출력
