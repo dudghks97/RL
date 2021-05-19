@@ -79,14 +79,14 @@ class GraphicDisplay(tk.Tk):
 
         # 캔버스에 이미지 추가
         self.rectangle = canvas.create_image(50, 50, image=self.shapes[0])
-        canvas.create_image(350, 450, image=self.shapes[2])  # 마침상태(동그라미)
-        canvas.create_image(50, 450, image=self.shapes[1])  # 장애물(세모)
-        canvas.create_image(150, 250, image=self.shapes[1])  # 장애물(세모)
-        canvas.create_image(150, 250, image=self.shapes[1])  # 장애물(세모)
-        canvas.create_image(250, 450, image=self.shapes[1])  # 장애물(세모)
-        canvas.create_image(350, 350, image=self.shapes[1])  # 장애물(세모)
-        canvas.create_image(450, 250, image=self.shapes[1])  # 장애물(세모)
-        canvas.create_image(550, 350, image=self.shapes[1])  # 장애물(세모)
+        canvas.create_image(450, 350, image=self.shapes[2])     # 마침상태(동그라미)
+        canvas.create_image(450, 50, image=self.shapes[1])      # 장애물(세모)
+        canvas.create_image(250, 150, image=self.shapes[1])     # 장애물(세모)
+        canvas.create_image(450, 250, image=self.shapes[1])     # 장애물(세모)
+        canvas.create_image(350, 350, image=self.shapes[1])     # 장애물(세모)
+        canvas.create_image(550, 350, image=self.shapes[1])     # 장애물(세모)
+        canvas.create_image(250, 450, image=self.shapes[1])     # 장애물(세모)
+        canvas.create_image(350, 550, image=self.shapes[1])     # 장애물(세모)
 
         canvas.pack()
 
@@ -218,6 +218,8 @@ class GraphicDisplay(tk.Tk):
         self.update()
 
     def calculate_value(self):
+        self.k += 1
+        print(f'k = {self.k}')
         self.iteration_count += 1
         for i in self.texts:
             self.canvas.delete(i)
