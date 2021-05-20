@@ -31,14 +31,14 @@ class GraphicDisplay(tk.Tk):
         (self.up, self.down, self.left,
          self.right), self.shapes = self.load_images()
         self.canvas = self._build_canvas()
-        self.text_reward(3, 4, "R : 1.0")
-        self.text_reward(0, 4, "R : -1.0")
-        self.text_reward(1, 2, "R : -1.0")
-        self.text_reward(2, 4, "R : -1.0")
-        self.text_reward(3, 3, "R : -1.0")
-        self.text_reward(3, 5, "R : -1.0")
-        self.text_reward(4, 2, "R : -1.0")
-        self.text_reward(5, 3, "R : -1.0")
+        self.text_reward(3, 4, "R : 1.0")  # 마침상태 보상
+        self.text_reward(0, 4, "R : -1.0")  # 장애물 보상
+        self.text_reward(1, 2, "R : -1.0")  # 장애물 보상
+        self.text_reward(2, 4, "R : -1.0")  # 장애물 보상
+        self.text_reward(3, 3, "R : -1.0")  # 장애물 보상
+        self.text_reward(3, 5, "R : -1.0")  # 장애물 보상
+        self.text_reward(4, 2, "R : -1.0")  # 장애물 보상
+        self.text_reward(5, 3, "R : -1.0")  # 장애물 보상
 
 
     def _build_canvas(self):
