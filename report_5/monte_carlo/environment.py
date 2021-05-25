@@ -6,8 +6,8 @@ from PIL import ImageTk, Image
 np.random.seed(1)
 PhotoImage = ImageTk.PhotoImage
 UNIT = 100  # 픽셀 수
-HEIGHT = 5  # 그리드 월드 세로
-WIDTH = 5  # 그리드 월드 가로
+HEIGHT = 7  # 그리드 월드 세로
+WIDTH = 7  # 그리드 월드 가로
 
 
 class Env(tk.Tk):
@@ -34,10 +34,15 @@ class Env(tk.Tk):
             canvas.create_line(x0, y0, x1, y1)
 
         # 캔버스에 이미지 추가
-        self.rectangle = canvas.create_image(50, 50, image=self.shapes[0])
-        self.triangle1 = canvas.create_image(250, 150, image=self.shapes[1])
-        self.triangle2 = canvas.create_image(150, 250, image=self.shapes[1])
-        self.circle = canvas.create_image(250, 250, image=self.shapes[2])
+        self.rectangle = canvas.create_image(50, 50, image=self.shapes[0])      # 시작 지점
+        self.triangle1 = canvas.create_image(250, 150, image=self.shapes[1])    # 장애물 지점
+        self.triangle2 = canvas.create_image(250, 450, image=self.shapes[1])    # 장애물 지점
+        self.triangle3 = canvas.create_image(350, 350, image=self.shapes[1])    # 장애물 지점
+        self.triangle4 = canvas.create_image(350, 550, image=self.shapes[1])    # 장애물 지점
+        self.triangle5 = canvas.create_image(450, 50, image=self.shapes[1])     # 장애물 지점
+        self.triangle6 = canvas.create_image(450, 250, image=self.shapes[1])    # 장애물 지점
+        self.triangle7 = canvas.create_image(550, 350, image=self.shapes[1])    # 장애물 지점
+        self.circle = canvas.create_image(450, 350, image=self.shapes[2])       # 목표 지점
 
         canvas.pack()
 
@@ -52,6 +57,42 @@ class Env(tk.Tk):
             Image.open("../img/circle.png").resize((65, 65)))
 
         return rectangle, triangle, circle
+
+    # 화면에 값 출력을 위한 text 생성 함수
+    def text_value(self, row, col, contents, action, font='Helvetica', size=10,
+                   style='normal', anchor="nw"):
+        if action == 0:     # 상
+            origin_x, origin_y = 7, 42
+        elif action == 1:   # 하
+            origin_x, origin_y = 85, 42
+        elif action == 2:   # 좌
+            origin_x, origin_y = 42, 5
+        elif action == 3:   # 우
+            origin_x, origin_y = 42, 77
+        else:
+            origin_x, origin_y = 42, 42
+
+        x, y = origin_y + (UNIT * col), origin_x + (UNIT * row)
+        font = (font, str(size), style)
+        text = self.canvas.create_text(x, y, fill="black", text=contents,
+                                       font=font, anchor=anchor)
+        return self.texts.append(text)
+
+    # text_value 함수를 통해 화면에 행동 확률을 출력하는 함수
+    def print_value_q_all(self, q_table, value_table):
+        for i in self.texts:
+            self.canvas.delete(i)
+        self.texts.clear()
+        for x in range(HEIGHT):
+            for y in range(WIDTH):
+                state = [x, y]
+                if str(state) in value_table.keys():
+                    temp = value_table[str(state)]
+                    self.text_value(y, x, round(temp, 2), 4)
+                for action in range(0, 4):
+                    if str(state) in q_table.keys():
+                        temp = q_table[str(state)][action]
+                        self.text_value(y, x, round(temp, 2), action)
 
     @staticmethod
     def coords_to_state(coords):
@@ -94,17 +135,25 @@ class Env(tk.Tk):
         if next_state == self.canvas.coords(self.circle):
             reward = 100
             done = True
+        # 장애물에 대한 보상
         elif next_state in [self.canvas.coords(self.triangle1),
-                            self.canvas.coords(self.triangle2)]:
+                            self.canvas.coords(self.triangle2),
+                            self.canvas.coords(self.triangle3),
+                            self.canvas.coords(self.triangle4),
+                            self.canvas.coords(self.triangle5),
+                            self.canvas.coords(self.triangle6),
+                            self.canvas.coords(self.triangle7),
+                            ]:
             reward = -100
             done = True
         else:
             reward = 0
             done = False
 
+        present_state = self.coords_to_state(state)
         next_state = self.coords_to_state(next_state)
 
-        return next_state, reward, done
+        return present_state, next_state, reward, done
 
     def render(self):
         time.sleep(0.03)
