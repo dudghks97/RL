@@ -34,7 +34,7 @@ class Env(tk.Tk):
             canvas.create_line(x0, y0, x1, y1)
 
         # 캔버스에 이미지 추가
-        self.rectangle = canvas.create_image(50, 50, image=self.shapes[0])      # 시작 지점
+        self.rectangle = canvas.create_image(50, 50, image=self.shapes[0])      # agent 시작 지점
         self.triangle1 = canvas.create_image(250, 150, image=self.shapes[1])    # 장애물 지점
         self.triangle2 = canvas.create_image(250, 450, image=self.shapes[1])    # 장애물 지점
         self.triangle3 = canvas.create_image(350, 350, image=self.shapes[1])    # 장애물 지점
@@ -86,7 +86,7 @@ class Env(tk.Tk):
         for x in range(HEIGHT):
             for y in range(WIDTH):
                 state = [x, y]
-                if state != [4, 3]:
+                if state != [4, 3]:     # 목표 지점은 제외하고 출력
                     if str(state) in value_table.keys():
                         temp = value_table[str(state)]
                         self.text_value(y, x, round(temp, 2), 4)

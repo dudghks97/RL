@@ -44,7 +44,8 @@ class MCAgent:
                     rev_state = str(rev_state)
                     G_t = rev_reward + self.discount_factor * G_t
                 value = self.value_table[state]
-                self.value_table[state] = (value + self.learning_rate * (G_t - value))
+                self.value_table[state] = (value +
+                                           self.learning_rate * (G_t - value))
 
     # 큐 함수에 따라서 행동을 반환
     # 입실론 탐욕 정책에 따라서 행동을 반환
@@ -81,7 +82,7 @@ class MCAgent:
                 max_index_list.append(index)
         return random.choice(max_index_list)
 
-    # 목표 지점을 찾아 갈 수 있도록 보상을 체크
+    # 목표 지점을 찾아 갈 수 있도록 보상을 1, 0, -1로 반환
     def get_reward(self, col, row):
         if col == 4 and row  == 3:
             return 1  # 목표 지점의 보상
@@ -141,7 +142,7 @@ if __name__ == "__main__":
     env = Env()
     agent = MCAgent(actions=list(range(env.n_actions)))
 
-    for episode in range(100):
+    for episode in range(1000):
         state = env.reset()
         action = agent.get_action(state)
 

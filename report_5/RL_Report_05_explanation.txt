@@ -8,11 +8,12 @@
 
 2. mc_agent.py 함수들 문제점 및 수정사항
   - 생성자 : Grid World 너비 및 높이 수정 행동 확률, 보상 table 추가
-  - 보상 table을 위해 save_reward 함수 추가
+  - 보상 table을 위해 save_reward 함수 추가(main 함수에서 사용)
   - 기존 update : G 값을 구하기 위해 reversed 된 state를 first visit의 판단으로 사용함
     사실상 last visit을 사용하고 있음. -> first visit 을 하도록 수정
     first visit을 하도록 수정하여, G를 구할 때 역순으로 계산이 안되는 문제점이 생기므로,
     G를 역순으로 계산 하는 반복문을 추가함.
+    전체적인 코드 수정이므로 박스 미사용 / 코드 다시 캡쳐해서 진행
   - get_action : 큐 함수에 따라서 행동을 반환하고, 입실론 탐욕 정책에 따라서 행동을 반환함.
     큐함수 값 변수를 추가함. 그러나 기존 코드에서의 possible_next_state는 큐함수를 반환하지 않음.(큐함수를 구하는 부분이 부재되어있음)
     행동 확률 값을 화면에 출력하기 위한 코드 추가
