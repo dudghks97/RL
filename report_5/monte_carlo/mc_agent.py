@@ -13,10 +13,10 @@ class MCAgent:
         self.learning_rate = 0.01   # 학습률
         self.discount_factor = 0.9  # 감가율
         self.epsilon = 0.1          # 입실론
-        self.samples = []
-        self.value_table = defaultdict(float)
-        self.percentage_table = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0])
-        self.reward_table = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0])
+        self.samples = []           # sample 리스트
+        self.value_table = defaultdict(float)                               # 가치함수 table
+        self.percentage_table = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0])   # 행동 확률 table
+        self.reward_table = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0])       # 보상 table
 
     # 메모리에 샘플을 추가
     def save_sample(self, state, reward, done):
@@ -30,7 +30,7 @@ class MCAgent:
     # 모든 에피소드에서 에이전트가 방문한 상태의 큐 함수를 업데이트
     def update(self):
         visit_state = []
-        sample_size = len(self.samples)                 # episode length
+        sample_size = len(self.samples)
         for i, forward in enumerate(self.samples):
             state, reward, done = forward
             state = str(state)
@@ -54,8 +54,8 @@ class MCAgent:
             action = np.random.choice(self.actions)
         else:
             # 큐 함수에 따른 행동
-            next_state = self.possible_next_state(state)
-            action = self.arg_max(next_state)
+            next_state, q_value = self.possible_next_state(state)
+            action = self.arg_max(q_value)
         # 행동 확률 값을 화면에 출력하기 위해 추가한 코드
         for i in range(0, 4):
             if i == int(action):
@@ -81,33 +81,55 @@ class MCAgent:
                 max_index_list.append(index)
         return random.choice(max_index_list)
 
+    # 목표 지점을 찾아 갈 수 있도록 보상을 체크
+    def get_reward(self, col, row):
+        if col == 4 and row  == 3:
+            return 1  # 목표 지점의 보상
+        elif [col, row] in [[4, 0], [2, 1], [4, 2], [3, 3], [5, 3], [2, 4], [3, 5]]:
+            return -1  # 장해물의 보상
+        else:
+            return 0
+
     # 가능한 다음 모든 상태들을 반환
     def possible_next_state(self, state):
         col, row = state
-        next_state = [0.0] * 4
-
+        next_state_value = [0.0] * 4
+        next_state_reward = [0] * 4  # 선택 가능한 행동에 대한 보상 배열
         # 상
         if row != 0:
-            next_state[0] = self.reward_table[str(state)][0] + self.discount_factor * self.value_table[str([col, row - 1])]
+            next_state_value[0] = self.value_table[str([col, row - 1])]
+            next_state_reward[0] = self.get_reward(col, row - 1)
         else:
-            next_state[0] = self.reward_table[str(state)][0] + self.discount_factor * self.value_table[str(state)]
+            next_state_value[0] = self.value_table[str(state)]
+            next_state_reward[0] = self.get_reward(col, row)
         # 하
         if row != self.height - 1:
-            next_state[1] = self.reward_table[str(state)][1] + self.discount_factor * self.value_table[str([col, row + 1])]
+            next_state_value[1] = self.value_table[str([col, row + 1])]
+            next_state_reward[1] = self.get_reward(col, row + 1)
         else:
-            next_state[1] = self.reward_table[str(state)][1] + self.discount_factor * self.value_table[str(state)]
+            next_state_value[1] = self.value_table[str(state)]
+            next_state_reward[1] = self.get_reward(col, row)
         # 좌
         if col != 0:
-            next_state[2] = self.reward_table[str(state)][2] + self.discount_factor * self.value_table[str([col - 1, row])]
+            next_state_value[2] = self.value_table[str([col - 1, row])]
+            next_state_reward[2] = self.get_reward(col - 1, row)
         else:
-            next_state[2] = self.reward_table[str(state)][2] + self.discount_factor * self.value_table[str(state)]
+            next_state_value[2] = self.value_table[str(state)]
+            next_state_reward[2] = self.get_reward(col, row)
         # 우
         if col != self.width - 1:
-            next_state[3] = self.reward_table[str(state)][3] + self.discount_factor * self.value_table[str([col + 1, row])]
+            next_state_value[3] = self.value_table[str([col + 1, row])]
+            next_state_reward[3] = self.get_reward(col + 1, row)
         else:
-            next_state[3] = self.reward_table[str(state)][3] + self.discount_factor * self.value_table[str(state)]
+            next_state_value[3] = self.value_table[str(state)]
+            next_state_reward[3] = self.get_reward(col, row)
 
-        return next_state
+        # 큐 함수 값 계산
+        q_value = [0.0, 0.0, 0.0, 0.0]
+        for i in range(4):
+            q_value[i] = next_state_reward[i] + (self.discount_factor * next_state_value[i])
+
+        return next_state_value, q_value
 
 
 # 메인 함수
@@ -119,7 +141,7 @@ if __name__ == "__main__":
     env = Env()
     agent = MCAgent(actions=list(range(env.n_actions)))
 
-    for episode in range(1000):
+    for episode in range(100):
         state = env.reset()
         action = agent.get_action(state)
 
@@ -129,8 +151,8 @@ if __name__ == "__main__":
 
             # 다음 상태로 이동
             # 보상은 숫자이고, 완료 여부는 boolean
-            now_state, next_state, reward, done = env.step(action)
-            agent.save_sample(now_state, reward, done)
+            present_state, next_state, reward, done = env.step(action)
+            agent.save_sample(present_state, reward, done)
             agent.save_reward(state, action, reward)
 
 
