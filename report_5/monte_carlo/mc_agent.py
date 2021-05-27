@@ -82,12 +82,12 @@ class MCAgent:
                 max_index_list.append(index)
         return random.choice(max_index_list)
 
-    # 목표 지점을 찾아 갈 수 있도록 보상을 1, 0, -1로 반환
+    # 각 위치 별로 보상을 1, 0, -1로 반환
     def get_reward(self, col, row):
-        if col == 4 and row  == 3:
+        if col == 4 and row == 3:
             return 1  # 목표 지점의 보상
         elif [col, row] in [[4, 0], [2, 1], [4, 2], [3, 3], [5, 3], [2, 4], [3, 5]]:
-            return -1  # 장해물의 보상
+            return -1  # 장애물의 보상
         else:
             return 0
 
